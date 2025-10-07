@@ -89,19 +89,32 @@ function reveal(r, c) {
   if (board[r][c] === "B") {
     alert("💥 Game Over!");
     gameOver = true;
+
     // Reveal all bombs
     for (let i = 0; i < size; i++) {
       for (let j = 0; j < size; j++) revealed[i][j] = true;
     }
-  } else if (board[r][c] === 0) {
-    // BFS using queue
+
+    render();
+    return; // stop here so win check won't run after losing
+  }
+
+  if (board[r][c] === 0) {
+    // BFS flood fill
     let queue = [[r, c]];
     while (queue.length) {
       let [x, y] = queue.shift();
       for (let dr = -1; dr <= 1; dr++) {
         for (let dc = -1; dc <= 1; dc++) {
           let nr = x + dr, nc = y + dc;
-          if (nr >= 0 && nr < size && nc >= 0 && nc < size && !revealed[nr][nc] && !flags[nr][nc]) {
+          if (
+            nr >= 0 &&
+            nr < size &&
+            nc >= 0 &&
+            nc < size &&
+            !revealed[nr][nc] &&
+            !flags[nr][nc]
+          ) {
             revealed[nr][nc] = true;
             if (board[nr][nc] === 0) queue.push([nr, nc]);
           }
@@ -110,11 +123,10 @@ function reveal(r, c) {
     }
   }
 
-  // ✅ Check win condition
-  if (checkWin()) {
+  // ✅ Check win only if game not over
+  if (!gameOver && checkWin()) {
     alert("🎉 Congratulations, You Win!");
     gameOver = true;
-    // reveal everything
     for (let i = 0; i < size; i++) {
       for (let j = 0; j < size; j++) revealed[i][j] = true;
     }
@@ -138,4 +150,8 @@ function checkWin() {
   return revealedCount === safeCells;
 }
 
+// Restart button
+document.getElementById("restart").addEventListener("click", init);
+
+// Start game
 init();
