@@ -1,22 +1,28 @@
-const size = 8;  // 8x8 board
-const bombs = 10;
+const size = 8;       // Board size
+const bombs = 10;     // Number of bombs
+
 let board = [];
 let revealed = [];
 let flags = [];
 let gameOver = false;
+let firstClick = true; // Fix for first click
 
-function init() {
+// Initialize arrays
+function createEmptyBoard() {
   board = Array.from({ length: size }, () => Array(size).fill(0));
   revealed = Array.from({ length: size }, () => Array(size).fill(false));
   flags = Array.from({ length: size }, () => Array(size).fill(false));
   gameOver = false;
+  firstClick = true;
+}
 
-  // place bombs
+// Place bombs ensuring first click is safe
+function placeBombs(safeR, safeC) {
   let placed = 0;
   while (placed < bombs) {
     let r = Math.floor(Math.random() * size);
     let c = Math.floor(Math.random() * size);
-    if (board[r][c] !== "B") {
+    if (board[r][c] !== "B" && !(r === safeR && c === safeC)) {
       board[r][c] = "B";
       placed++;
 
@@ -31,13 +37,12 @@ function init() {
       }
     }
   }
-
-  render();
 }
 
+// Render the board
 function render() {
   const boardDiv = document.getElementById("board");
-  boardDiv.style.gridTemplateColumns = `repeat(${size}, 35px)`;
+  boardDiv.style.gridTemplateColumns = `repeat(${size}, 40px)`;
   boardDiv.innerHTML = "";
 
   for (let r = 0; r < size; r++) {
@@ -45,28 +50,17 @@ function render() {
       const cell = document.createElement("div");
       cell.classList.add("cell");
 
-      // Revealed cells
       if (revealed[r][c]) {
         cell.classList.add("revealed");
-        if (board[r][c] === "B") {
-          cell.classList.add("bomb");
-          cell.textContent = "💣";
-        } else if (board[r][c] > 0) {
-          cell.textContent = board[r][c];
-          cell.setAttribute("data-num", board[r][c]);
-        }
-      }
-      // Flags
-      else if (flags[r][c]) {
+        if (board[r][c] === "B") cell.textContent = "💣";
+        else if (board[r][c] > 0) cell.textContent = board[r][c];
+      } else if (flags[r][c]) {
         cell.classList.add("flag");
         cell.textContent = "🚩";
       }
 
-      // Left click (reveal)
       cell.addEventListener("click", () => reveal(r, c));
-
-      // Right click (toggle flag)
-      cell.addEventListener("contextmenu", (e) => {
+      cell.addEventListener("contextmenu", e => {
         e.preventDefault();
         toggleFlag(r, c);
       });
@@ -76,82 +70,87 @@ function render() {
   }
 }
 
+// Toggle flag
 function toggleFlag(r, c) {
-  if (revealed[r][c] || gameOver) return; // can't flag revealed or finished
+  if (revealed[r][c] || gameOver) return;
   flags[r][c] = !flags[r][c];
   render();
 }
 
+// Reveal cell
 function reveal(r, c) {
   if (revealed[r][c] || flags[r][c] || gameOver) return;
+
+  // Place bombs on first click
+  if (firstClick) {
+    placeBombs(r, c);
+    firstClick = false;
+  }
+
   revealed[r][c] = true;
 
   if (board[r][c] === "B") {
+    gameOver = true;
     alert("💥 Game Over!");
-    gameOver = true;
-
-    // Reveal all bombs
-    for (let i = 0; i < size; i++) {
-      for (let j = 0; j < size; j++) revealed[i][j] = true;
-    }
-
+    revealAll();
     render();
-    return; // stop here so win check won't run after losing
+    return;
   }
 
-  if (board[r][c] === 0) {
-    // BFS flood fill
-    let queue = [[r, c]];
-    while (queue.length) {
-      let [x, y] = queue.shift();
-      for (let dr = -1; dr <= 1; dr++) {
-        for (let dc = -1; dc <= 1; dc++) {
-          let nr = x + dr, nc = y + dc;
-          if (
-            nr >= 0 &&
-            nr < size &&
-            nc >= 0 &&
-            nc < size &&
-            !revealed[nr][nc] &&
-            !flags[nr][nc]
-          ) {
-            revealed[nr][nc] = true;
-            if (board[nr][nc] === 0) queue.push([nr, nc]);
-          }
-        }
-      }
-    }
-  }
+  // Expand empty cells
+  if (board[r][c] === 0) expandEmpty(r, c);
 
-  // ✅ Check win only if game not over
-  if (!gameOver && checkWin()) {
-    alert("🎉 Congratulations, You Win!");
+  if (checkWin()) {
     gameOver = true;
-    for (let i = 0; i < size; i++) {
-      for (let j = 0; j < size; j++) revealed[i][j] = true;
-    }
+    alert("🎉 You Win!");
+    revealAll();
   }
 
   render();
 }
 
-function checkWin() {
-  let safeCells = size * size - bombs;
-  let revealedCount = 0;
-
-  for (let i = 0; i < size; i++) {
-    for (let j = 0; j < size; j++) {
-      if (revealed[i][j] && board[i][j] !== "B") {
-        revealedCount++;
+// BFS expansion for empty cells
+function expandEmpty(r, c) {
+  let queue = [[r, c]];
+  while (queue.length) {
+    let [x, y] = queue.shift();
+    for (let dr = -1; dr <= 1; dr++) {
+      for (let dc = -1; dc <= 1; dc++) {
+        let nr = x + dr, nc = y + dc;
+        if (nr >= 0 && nr < size && nc >= 0 && nc < size &&
+            !revealed[nr][nc] && board[nr][nc] !== "B") {
+          revealed[nr][nc] = true;
+          if (board[nr][nc] === 0) queue.push([nr, nc]);
+        }
       }
     }
   }
-
-  return revealedCount === safeCells;
 }
 
-// Restart button
-document.getElementById("restart").addEventListener("click", init);
+// Check win
+function checkWin() {
+  let safe = 0;
+  for (let r = 0; r < size; r++)
+    for (let c = 0; c < size; c++)
+      if (revealed[r][c] && board[r][c] !== "B") safe++;
+  return safe === size*size - bombs;
+}
 
-// Start game
-init();
+// Reveal all cells
+function revealAll() {
+  for (let r = 0; r < size; r++)
+    for (let c = 0; c < size; c++)
+      revealed[r][c] = true;
+}
+
+// Restart
+function init() {
+  createEmptyBoard();
+  render();
+}
+
+// Initialize on DOM ready
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("restart").addEventListener("click", init);
+  init();
+});

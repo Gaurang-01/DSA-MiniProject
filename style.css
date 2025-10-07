@@ -1,84 +1,90 @@
 body {
-  font-family: Arial, sans-serif;
-  text-align: center;
-  background: linear-gradient(135deg, #f0f9ff, #cbebff, #a6d8ff);
-  min-height: 100vh;
+  background-color: #f0f4f8;
+  font-family: 'Poppins', sans-serif;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
+  min-height: 100vh;
   margin: 0;
+  padding: 20px;
 }
 
 h1 {
+  color: #2c3e50;
   margin-bottom: 20px;
-  color: #333;
+}
+
+.container {
+  text-align: center;
 }
 
 #board {
   display: grid;
-  margin: 20px auto;
-  gap: 2px;
+  gap: 3px;
   justify-content: center;
-  align-items: center;
+  margin-bottom: 20px;
 }
 
 .cell {
-  width: 35px;
-  height: 35px;
+  width: 40px;
+  height: 40px;
+  background-color: #dceefb;
+  border: 1px solid #ccc;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid #333;
-  cursor: pointer;
-  background: #d1d1d1;
   font-weight: bold;
-  user-select: none;
+  font-size: 18px;
+  cursor: pointer;
   border-radius: 4px;
-  font-size: 16px;
-  transition: background 0.2s;
+  user-select: none;
+  transition: 0.2s ease-in-out;
 }
 
 .cell:hover {
-  background: #c1c1c1;
+  background-color: #bcd4f6;
 }
 
 .revealed {
-  background: #fdfdfd;
+  background-color: #e8f1f8;
+  border-color: #999;
   cursor: default;
 }
 
+/* Bomb Cell */
 .bomb {
-  background: #ff4d4d;
-  color: white;
+  background-color: #f7d6d0;
+  color: #c0392b;
 }
 
-/* Number colors based on classic Minesweeper */
-.cell[data-num="1"] { color: #0000ff; }   /* Blue */
-.cell[data-num="2"] { color: #008000; }   /* Green */
-.cell[data-num="3"] { color: #ff0000; }   /* Red */
-.cell[data-num="4"] { color: #000080; }   /* Dark Blue */
-.cell[data-num="5"] { color: #800000; }   /* Brown */
-.cell[data-num="6"] { color: #008080; }   /* Cyan */
-.cell[data-num="7"] { color: #000000; }   /* Black */
-.cell[data-num="8"] { color: #808080; }   /* Gray */
-
+/* Flag Cell */
 .flag {
-  background: #fdfdfd;
-  color: #ff6600;
+  color: #e74c3c;
+  font-size: 20px;
 }
+
+/* Number Colors */
+.revealed[data-num="1"] { color: #3498db; }   /* blue */
+.revealed[data-num="2"] { color: #27ae60; }   /* green */
+.revealed[data-num="3"] { color: #e74c3c; }   /* red */
+.revealed[data-num="4"] { color: #8e44ad; }   /* purple */
+.revealed[data-num="5"] { color: #d35400; }   /* orange */
+.revealed[data-num="6"] { color: #16a085; }   /* teal */
+.revealed[data-num="7"] { color: #2c3e50; }   /* dark blue */
+.revealed[data-num="8"] { color: #7f8c8d; }   /* gray */
 
 button {
-  margin-top: 15px;
   padding: 10px 20px;
-  background: #0077cc;
-  color: white;
+  font-size: 16px;
   border: none;
-  border-radius: 6px;
-  font-size: 14px;
+  background-color: #2e86de;
+  color: white;
+  border-radius: 5px;
   cursor: pointer;
+  transition: 0.2s;
 }
 
 button:hover {
-  background: #005fa3;
+  background-color: #2164a9;
 }
