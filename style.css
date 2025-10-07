@@ -1,0 +1,84 @@
+body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  background: linear-gradient(135deg, #f0f9ff, #cbebff, #a6d8ff);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+}
+
+h1 {
+  margin-bottom: 20px;
+  color: #333;
+}
+
+#board {
+  display: grid;
+  margin: 20px auto;
+  gap: 2px;
+  justify-content: center;
+  align-items: center;
+}
+
+.cell {
+  width: 35px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #333;
+  cursor: pointer;
+  background: #d1d1d1;
+  font-weight: bold;
+  user-select: none;
+  border-radius: 4px;
+  font-size: 16px;
+  transition: background 0.2s;
+}
+
+.cell:hover {
+  background: #c1c1c1;
+}
+
+.revealed {
+  background: #fdfdfd;
+  cursor: default;
+}
+
+.bomb {
+  background: #ff4d4d;
+  color: white;
+}
+
+/* Number colors based on classic Minesweeper */
+.cell[data-num="1"] { color: #0000ff; }   /* Blue */
+.cell[data-num="2"] { color: #008000; }   /* Green */
+.cell[data-num="3"] { color: #ff0000; }   /* Red */
+.cell[data-num="4"] { color: #000080; }   /* Dark Blue */
+.cell[data-num="5"] { color: #800000; }   /* Brown */
+.cell[data-num="6"] { color: #008080; }   /* Cyan */
+.cell[data-num="7"] { color: #000000; }   /* Black */
+.cell[data-num="8"] { color: #808080; }   /* Gray */
+
+.flag {
+  background: #fdfdfd;
+  color: #ff6600;
+}
+
+button {
+  margin-top: 15px;
+  padding: 10px 20px;
+  background: #0077cc;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #005fa3;
+}
